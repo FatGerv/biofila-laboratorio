@@ -1,0 +1,57 @@
+<main class="shell">
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="Biofila, inicio">
+      <span class="brand-mark">B/</span>
+      <span class="brand-copy"><strong>BIOFILA</strong><small>UNIDAD DE ATENCIÓN · SISTEMA 01</small></span>
+    </a>
+    <div class="top-actions">
+      <span class="connection" [class.offline]="!apiOnline()"><i></i>{{ apiOnline() ? 'API CONECTADA' : 'CONECTANDO API' }}</span>
+      <button class="sound-toggle" type="button" (click)="toggleSound()">{{ soundEnabled() ? '♫ SONIDO ON' : '♫ SONIDO OFF' }}</button>
+    </div>
+  </header>
+
+  <section class="hero" id="inicio">
+    <div><p class="eyebrow">// Centro de operaciones</p><h1>Flujo de<br>atención<span>.</span></h1><p class="intro">Turnos coordinados con calma, precisión y cuidado.</p></div>
+    <div class="clock-panel"><strong>{{ clock() | date:'HH:mm:ss' }}</strong><span>JORNADA MATUTINA<br>LABORATORIO CENTRAL / NIVEL 01</span></div>
+  </section>
+
+  @if (api.state(); as state) {
+    <section class="metrics" aria-label="Resumen de atención">
+      <article class="metric"><span>Turnos emitidos</span><strong>{{ state.issued | number:'2.0-0' }}</strong></article>
+      <article class="metric"><span>En espera</span><strong>{{ state.queue.length | number:'2.0-0' }}</strong></article>
+      <article class="metric"><span>En atención</span><strong>{{ servingCount | number:'2.0-0' }}</strong></article>
+      <article class="metric"><span>Atenciones concluidas</span><strong>{{ state.served | number:'2.0-0' }}</strong></article>
+    </section>
+
+    <div class="workspace">
+      <section class="panel ticket-panel">
+        <div class="panel-heading"><h2>Emisión de turno</h2><span class="micro-tag">MÓDULO A—01</span></div>
+        <div class="ticket-content"><span class="micro-label">SIGUIENTE DISPONIBLE</span>
+          <div class="ticket-stub"><span>TURNO DE ATENCIÓN</span><strong>{{ state.next_ticket }}</strong><small>PRIORIDAD · GENERAL</small></div>
+          <button class="primary-button" type="button" (click)="newTicket()" [disabled]="busy()">＋ &nbsp; TOMAR TURNO</button>
+          <p class="hint">El turno se añadirá al final de la fila activa.</p>
+        </div>
+        <div class="queue-block"><div class="queue-heading"><span>FILA DE ESPERA</span><span>{{ state.queue.length | number:'2.0-0' }} EN COLA</span></div>
+          @if (state.queue.length) { <div class="queue-list">@for (ticket of state.queue; track ticket) { <span class="queue-ticket">{{ ticket }}</span> }</div> }
+          @else { <p class="empty-queue">Fila despejada. No hay turnos pendientes.</p> }
+        </div>
+      </section>
+
+      <section class="panel station-panel"><div class="panel-heading"><h2>Estaciones de atención</h2><span class="micro-tag">4 MÓDULOS ACTIVOS</span></div>
+        <div class="station-grid">@for (station of state.stations; track station.id) {
+          <article class="station-card" [class.occupied]="station.ticket">
+            <div class="station-meta"><span>MÓDULO 0{{ station.id }}</span><span class="station-status" [class.active]="station.ticket">{{ station.ticket ? '● ATENDIENDO' : '○ DISPONIBLE' }}</span></div>
+            <strong class="station-ticket">{{ station.ticket ?? '— — —' }}</strong><span class="patient-label">{{ station.patient ?? 'En espera de turno' }}</span>
+            @if (station.ticket) { <button class="finish-button" type="button" (click)="finish(station)" [disabled]="busy()">✓ &nbsp; FINALIZAR ATENCIÓN</button> }
+            @else { <button class="call-button" type="button" (click)="callNext(station.id)" [disabled]="!state.queue.length || busy()">↗ &nbsp; LLAMAR SIGUIENTE</button> }
+          </article>
+        }</div>
+      </section>
+    </div>
+  } @else {
+    <section class="loading-panel"><span class="spinner"></span><p>Conectando con el laboratorio…</p><small>Verifica que la API de Python esté iniciada en el puerto 8000.</small></section>
+  }
+
+  <footer class="footer"><span>BIOFILA // GESTIÓN DE FLUJO DE PACIENTES</span><span>FRONT ANGULAR · BACK PYTHON</span></footer>
+</main>
+@if (notice()) { <div class="toast" role="status" aria-live="polite">{{ notice() }}</div> }

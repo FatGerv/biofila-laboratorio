@@ -5,7 +5,7 @@ Sistema de gestión de turnos para un laboratorio y sus cuatro módulos de atenc
 ## Requisitos
 
 - Python 3.10 o posterior
-- Node.js 24.15 o posterior y npm
+- Node.js 22.22.3 o 24.15 o posterior y npm (Angular 22 no admite Node 25)
 
 ## Ejecutar en local
 

@@ -7,3 +7,4 @@ dist/
 .angular/
 backend/.biofila-api.log
 frontend/.biofila-angular.log
+.npm-cache/

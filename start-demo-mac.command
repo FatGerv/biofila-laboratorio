@@ -66,7 +66,7 @@ done
 
 if [ "$ready" -eq 1 ]; then
   echo "Biofila está lista. Se abrirá en http://localhost:4200"
-  open http://localhost:4200
+  open http://localhost:4200 || echo "No pude abrir el navegador automáticamente; abre http://localhost:4200 manualmente."
 else
   echo "No se pudieron iniciar los servicios. Revisa backend/.biofila-api.log y frontend/.biofila-angular.log"
 fi

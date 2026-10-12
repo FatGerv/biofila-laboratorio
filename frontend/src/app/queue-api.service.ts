@@ -19,7 +19,7 @@ export interface QueueState {
 @Injectable({ providedIn: 'root' })
 export class QueueApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8000/api';
+  private readonly baseUrl = '/api';
   readonly state = signal<QueueState | null>(null);
 
   refresh(): Observable<QueueState> {
